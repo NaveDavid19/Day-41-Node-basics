@@ -1,7 +1,6 @@
 import fs from 'fs'
 import https from 'https'
 
-// downloadCountryFlags()
 function downloadCountryFlags() {
     const countries = getCountries()
     console.log('Countries: ', countries.map(c => c.name));
@@ -17,17 +16,22 @@ function getCountries() {
     countries.sort((a, b) => b.population - a.population)
     return countries.slice(0, 5)
 }
-downloadFlags(getCountries())
-function downloadFlags(countries) {
-    countries.forEach(countrie => {
-        const file = fs.createWriteStream(`flags/${countrie.name.common}.jpg`)
-        const request = https.request(countrie.flags.png, function (response) {
-            response.pipe(file)
-        });
 
-        // TODO: use the download() function to download a flag
-        // the name of the file should be the country name
-        //TODO: use the Array.map function to generate a promise for each download
-        //TODO: use Promise.all()
-    })
+function downloadFlags(countries) {
+    const promises = countries.map(countrie => {
+        return new Promise((resolve, reject) => {
+            https.get(countrie.flags.png, (res) => {
+                if (!res) reject(new Error())
+                const writeStream = fs.createWriteStream(`flags/${countrie.name.common}.jpg`);
+                writeStream.on('finish', () => {
+                    resolve()
+                });
+                writeStream.on('error', (err) => {
+                    reject(new Error())
+                });
+                res.pipe(writeStream);
+            })
+        })
+    });
+    return Promise.all(promises)
 }
