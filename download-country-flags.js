@@ -1,6 +1,7 @@
 import fs from 'fs'
 import https from 'https'
 
+downloadCountryFlags()
 function downloadCountryFlags() {
     const countries = getCountries()
     console.log('Countries: ', countries.map(c => c.name));
