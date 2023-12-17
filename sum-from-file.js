@@ -1,12 +1,17 @@
-import fs from 'fs'
-
+import fs from 'fs';
 
 function sumFromFile(file) {
-    let nums = 0
     return new Promise((resolve, reject) => {
         fs.readFile(file, 'utf8', (err, contents) => {
-            if (err) return reject('error')
-            return resolve(numbers)
-        })
-    })
+            if (err) return reject('error reading file');
+
+            const numbers = contents.split('\n').map(Number);
+            const sum = numbers.reduce((acc, num) => acc + num, 0);
+            resolve(sum);
+        });
+    });
 }
+
+sumFromFile('sum-from-file.txt')
+    .then(sum => console.log(sum))
+    .catch(err => console.log(err));
